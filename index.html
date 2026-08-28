@@ -100,6 +100,13 @@
             width: 100%;
             margin: 6px 0;
         }
+        .profile-info {
+            text-align: center;
+            padding: 20px 0;
+        }
+        .profile-info .avatar {
+            font-size: 60px;
+        }
     </style>
 </head>
 <body>
@@ -136,10 +143,20 @@
             </div>
         </div>
 
+        <!-- PROFILE PAGE -->
+        <div id="profilePage" class="page">
+            <div class="profile-info">
+                <div class="avatar">🐱</div>
+                <h2 id="profileName">User</h2>
+                <p style="color:#800020;">Member since 2024</p>
+                <button onclick="logout()" style="background:#800020; margin-top:12px;">Logout</button>
+            </div>
+        </div>
+
         <!-- BOTTOM NAV -->
         <div class="bottom-nav">
             <button class="active" onclick="showPage('chatsPage')">💬 Chats</button>
-            <button onclick="logout()">🚪 Logout</button>
+            <button onclick="showPage('profilePage')">👤 Profile</button>
         </div>
     </div>
 
@@ -215,6 +232,7 @@
         function showApp() {
             document.getElementById('authPage').style.display = 'none';
             document.getElementById('appPage').style.display = 'flex';
+            document.getElementById('profileName').textContent = currentUser;
             renderChatList();
         }
 
