@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Messenger</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: sans-serif; }
+        body { background: #ffe6e6; color: #b3002d; }
+        .page { display: none; padding: 16px; }
+        .page.active { display: block; }
+        input, button { padding: 8px; border-radius: 8px; border: none; }
+        button { background: #ff0066; color: #fff; cursor: pointer; }
+        .message { background: #ffcccc; padding: 6px; margin: 4px 0; border-radius: 6px; }
+        .me { background: #ff4d4d; color: #fff; text-align: right; }
+        .bottom-nav { display: flex; justify-content: space-around; background: #ff4d4d; padding: 10px; }
+        .bottom-nav button { background: none; color: #fff; border: none; }
+        .bottom-nav button.active { border-bottom: 2px solid #fff; }
+    </style>
+</head>
+<body>
+
+    <div id="authPage" class="page active">
+        <h2>🐱 Messenger</h2>
+        <input type="text" id="authUsername" placeholder="Username...">
+        <button onclick="register()">Register</button>
+        <button onclick="login()" style="background:#800020;">Login</button>
+    </div>
+
+    <div id="appPage" style="display:none;">
+        <div id="chatsPage" class="page active">
+            <h2>💬 Chats</h2>
+            <div id="chatList"></div>
+        </div>
+
+        <div id="chatPage" class="page">
+            <button onclick="backToChats()">← Back</button>
+            <div id="chatMessages"></div>
+            <input type="text" id="chatInput" placeholder="Type...">
+            <button onclick="sendMessage()">Send</button>
+        </div>
+
+        <div class="bottom-nav">
+            <button class="active" onclick="showPage('chatsPage')">💬 Chats</button>
+            <button onclick="logout()">🚪 Logout</button>
+        </div>
+    </div>
+
+    <script>
+        // ============= JSONBIN CONFIG =============
+        var BIN_ID = '6a790240f5f4af5e29000367';
+        var API_KEY = '$2a$10$YJqHMZfdvZ/oBZOz6EoWgexdGklYtIB8Hf2VhmRSujXeWTo4xnGfG';
+
+        // ============= STATE =============
+        var currentUser = localStorage.getItem('currentUser') || null;
+        var users = [];
+        var messages = [];
+        var currentChat = 'General';
+
+        // ============= LOAD DATA =============
+        function loadData(callback) {
+            var xhr = new XMLHttpRequest();
+            xhr.open('GET', 'https://api.jsonbin.io/v3/b/' + BIN_ID, true);
+            xhr.setRequestHeader('X-Access-Key', API_KEY);
+            xhr.onload = function() {
+                if (xhr.status === 200) {
+                    var data = JSON.parse(xhr.responseText);
+                    users = data.record.users || [];
+                    messages = data.record.messages || [];
+                    if (callback) callback();
+                }
+            };
+            xhr.send();
+        }
+
+        function saveData(callback) {
+            var data = JSON.stringify({ users: users, messages: messages });
+            var xhr = new XMLHttpRequest();
+            xhr.open('PUT', 'https://api.jsonbin.io/v3/b/' + BIN_ID, true);
+            xhr.setRequestHeader('Content-Type', 'application/json');
+            xhr.setRequestHeader('X-Access-Key', API_KEY);
+            xhr.onload = function() {
+                if (callback) callback();
+            };
+            xhr.send(data);
+        }
+
+        // ============= REGISTER =============
+        function register() {
+            var username = document.getElementById('authUsername').value.trim();
+            if (!username) return alert('Enter a username');
+            loadData(function() {
+                if (users.indexOf(username) !== -1) return alert('Username taken');
+                users.push(username);
+                saveData(function() {
+                    currentUser = username;
+                    localStorage.setItem('currentUser', username);
+                    showApp();
+                });
+            });
+        }
+
+        function login() {
+            var username = document.getElementById('authUsername').value.trim();
+            if (!username) return alert('Enter your username');
+            loadData(function() {
+                if (users.indexOf(username) === -1) return alert('User not found');
+                currentUser = username;
+                localStorage.setItem('currentUser', username);
+                showApp();
+            });
+        }
+
+        function logout() {
+            currentUser = null;
+            localStorage.removeItem('currentUser');
+            document.getElementById('appPage').style.display = 'none';
+            document.getElementById('authPage').classList.add('active');
+            document.getElementById('authPage').style.display = 'block';
+        }
+
+        function showApp() {
+            document.getElementById('authPage').style.display = 'none';
+            document.getElementById('appPage').style.display = 'block';
+            renderChatList();
+        }
+
+        // ============= RENDER =============
+        function renderChatList() {
+            document.getElementById('chatList').innerHTML = '<div class="chat-item" onclick="openChat(\'General\')">📢 General</div>';
+        }
+
+        function openChat(name) {
+            currentChat = name;
+            document.getElementById('chatPage').classList.add('active');
+            document.getElementById('chatsPage').classList.remove('active');
+            renderMessages();
+        }
+
+        function renderMessages() {
+            var container = document.getElementById('chatMessages');
+            container.innerHTML = '';
+            loadData(function() {
+                var chatMessages = messages.filter(function(m) { return m.chat === currentChat; });
+                for (var i = 0; i < chatMessages.length; i++) {
+                    var m = chatMessages[i];
+                    var div = document.createElement('div');
+                    div.className = 'message' + (m.user === currentUser ? ' me' : '');
+                    div.textContent = m.user + ': ' + m.text + ' (' + m.time + ')';
+                    container.appendChild(div);
+                }
+            });
+        }
+
+        function sendMessage() {
+            var input = document.getElementById('chatInput');
+            var text = input.value.trim();
+            if (!text) return;
+            loadData(function() {
+                messages.push({
+                    chat: currentChat,
+                    user: currentUser,
+                    text: text,
+                    time: new Date().toLocaleTimeString()
+                });
+                saveData(function() {
+                    input.value = '';
+                    renderMessages();
+                });
+            });
+        }
+
+        function backToChats() {
+            document.getElementById('chatsPage').classList.add('active');
+            document.getElementById('chatPage').classList.remove('active');
+        }
+
+        function showPage(pageId) {
+            document.querySelectorAll('.page').forEach(function(p) { p.classList.remove('active'); });
+            document.getElementById(pageId).classList.add('active');
+        }
+
+        // ============= INIT =============
+        loadData(function() {
+            if (localStorage.getItem('currentUser')) {
+                var user = localStorage.getItem('currentUser');
+                if (users.indexOf(user) !== -1) {
+                    currentUser = user;
+                    showApp();
+                }
+            }
+        });
+    </script>
+</body>
+              </html>
