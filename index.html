@@ -4,171 +4,58 @@
     <title>Messenger</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: sans-serif; }
-        body { 
-            background: #ffe6e6; 
-            color: #b3002d; 
-            height: 100vh; 
-            display: flex; 
-            flex-direction: column; 
-        }
-        .page { 
-            display: none; 
-            flex: 1; 
-            padding: 16px; 
-            overflow-y: auto; 
-        }
-        .page.active { 
-            display: flex; 
-            flex-direction: column; 
-        }
-        input, button { 
-            padding: 8px; 
-            border-radius: 8px; 
-            border: none; 
-        }
-        button { 
-            background: #ff0066; 
-            color: #fff; 
-            cursor: pointer; 
-        }
-        .message { 
-            background: #ffcccc; 
-            padding: 6px; 
-            margin: 4px 0; 
-            border-radius: 6px; 
-        }
-        .me { 
-            background: #ff4d4d; 
-            color: #fff; 
-            text-align: right; 
-        }
-        .bottom-nav { 
-            display: flex; 
-            justify-content: space-around; 
-            background: #ff4d4d; 
-            padding: 10px; 
-            flex-shrink: 0; 
-        }
-        .bottom-nav button { 
-            background: none; 
-            color: #fff; 
-            border: none; 
-            font-size: 14px; 
-        }
-        .bottom-nav button.active { 
-            border-bottom: 2px solid #fff; 
-        }
-        .input-area {
-            display: flex;
-            gap: 8px;
-            padding: 8px 0;
-            flex-shrink: 0;
-        }
-        .input-area input {
-            flex: 1;
-            background: #ffcccc;
-            color: #b3002d;
-        }
-        #chatMessages {
-            flex: 1;
-            overflow-y: auto;
-            margin-bottom: 8px;
-        }
-        .chat-item {
-            background: #ffcccc;
-            padding: 12px;
-            border-radius: 8px;
-            margin-bottom: 8px;
-            cursor: pointer;
-        }
-        .chat-item:hover {
-            background: #ffb3b3;
-        }
-        .auth-box {
-            max-width: 300px;
-            margin: auto;
-            text-align: center;
-            padding: 20px;
-        }
-        .auth-box input {
-            width: 100%;
-            margin: 6px 0;
-            background: #ffcccc;
-            color: #b3002d;
-        }
-        .auth-box button {
-            width: 100%;
-            margin: 6px 0;
-        }
-        .profile-info {
-            text-align: center;
-            padding: 20px 0;
-        }
-        .profile-info .avatar {
-            font-size: 60px;
-        }
+        body { background: #ffe6e6; color: #b3002d; }
+        .page { display: none; padding: 16px; }
+        .page.active { display: block; }
+        input, button { padding: 8px; border-radius: 8px; border: none; }
+        button { background: #ff0066; color: #fff; cursor: pointer; }
+        .message { background: #ffcccc; padding: 6px; margin: 4px 0; border-radius: 6px; }
+        .me { background: #ff4d4d; color: #fff; text-align: right; }
+        .bottom-nav { display: flex; justify-content: space-around; background: #ff4d4d; padding: 10px; }
+        .bottom-nav button { background: none; color: #fff; border: none; }
+        .bottom-nav button.active { border-bottom: 2px solid #fff; }
     </style>
 </head>
 <body>
 
-    <!-- AUTH PAGE -->
     <div id="authPage" class="page active">
-        <div class="auth-box">
-            <h2>🐱 Messenger</h2>
-            <input type="text" id="authUsername" placeholder="Username...">
-            <button onclick="register()">Register</button>
-            <button onclick="login()" style="background:#800020;">Login</button>
-        </div>
+        <h2>🐱 Messenger</h2>
+        <input type="text" id="authUsername" placeholder="Username...">
+        <button onclick="register()">Register</button>
+        <button onclick="login()" style="background:#800020;">Login</button>
     </div>
 
-    <!-- APP -->
-    <div id="appPage" style="display:none; flex-direction:column; height:100vh;">
-        
-        <!-- CHATS PAGE -->
+    <div id="appPage" style="display:none;">
         <div id="chatsPage" class="page active">
             <h2>💬 Chats</h2>
             <div id="chatList"></div>
         </div>
 
-        <!-- CHAT PAGE -->
         <div id="chatPage" class="page">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-                <button onclick="backToChats()" style="background:#800020;">← Back</button>
-                <span id="chatTitle" style="font-weight:bold;">General</span>
-            </div>
+            <button onclick="backToChats()">← Back</button>
             <div id="chatMessages"></div>
-            <div class="input-area">
-                <input type="text" id="chatInput" placeholder="Type...">
-                <button onclick="sendMessage()">Send</button>
-            </div>
+            <input type="text" id="chatInput" placeholder="Type...">
+            <button onclick="sendMessage()">Send</button>
         </div>
 
-        <!-- PROFILE PAGE -->
-        <div id="profilePage" class="page">
-            <div class="profile-info">
-                <div class="avatar">🐱</div>
-                <h2 id="profileName">User</h2>
-                <p style="color:#800020;">Member since 2024</p>
-                <button onclick="logout()" style="background:#800020; margin-top:12px;">Logout</button>
-            </div>
-        </div>
-
-        <!-- BOTTOM NAV -->
         <div class="bottom-nav">
             <button class="active" onclick="showPage('chatsPage')">💬 Chats</button>
-            <button onclick="showPage('profilePage')">👤 Profile</button>
+            <button onclick="logout()">🚪 Logout</button>
         </div>
     </div>
 
     <script>
+        // ============= JSONBIN CONFIG =============
         var BIN_ID = '6a790240f5f4af5e29000367';
         var API_KEY = '$2a$10$YJqHMZfdvZ/oBZOz6EoWgexdGklYtIB8Hf2VhmRSujXeWTo4xnGfG';
 
+        // ============= STATE =============
         var currentUser = localStorage.getItem('currentUser') || null;
         var users = [];
         var messages = [];
         var currentChat = 'General';
 
+        // ============= LOAD DATA =============
         function loadData(callback) {
             var xhr = new XMLHttpRequest();
             xhr.open('GET', 'https://api.jsonbin.io/v3/b/' + BIN_ID, true);
@@ -196,6 +83,7 @@
             xhr.send(data);
         }
 
+        // ============= REGISTER =============
         function register() {
             var username = document.getElementById('authUsername').value.trim();
             if (!username) return alert('Enter a username');
@@ -225,32 +113,25 @@
             currentUser = null;
             localStorage.removeItem('currentUser');
             document.getElementById('appPage').style.display = 'none';
-            document.getElementById('authPage').style.display = 'block';
             document.getElementById('authPage').classList.add('active');
+            document.getElementById('authPage').style.display = 'block';
         }
 
         function showApp() {
             document.getElementById('authPage').style.display = 'none';
-            document.getElementById('appPage').style.display = 'flex';
-            document.getElementById('profileName').textContent = currentUser;
+            document.getElementById('appPage').style.display = 'block';
             renderChatList();
         }
 
+        // ============= RENDER =============
         function renderChatList() {
-            var container = document.getElementById('chatList');
-            container.innerHTML = '';
-            var div = document.createElement('div');
-            div.className = 'chat-item';
-            div.innerHTML = '📢 General';
-            div.onclick = function() { openChat('General'); };
-            container.appendChild(div);
+            document.getElementById('chatList').innerHTML = '<div class="chat-item" onclick="openChat(\'General\')">📢 General</div>';
         }
 
         function openChat(name) {
             currentChat = name;
-            document.getElementById('chatTitle').textContent = name;
-            document.getElementById('chatsPage').classList.remove('active');
             document.getElementById('chatPage').classList.add('active');
+            document.getElementById('chatsPage').classList.remove('active');
             renderMessages();
         }
 
@@ -258,23 +139,14 @@
             var container = document.getElementById('chatMessages');
             container.innerHTML = '';
             loadData(function() {
-                var chatMessages = [];
-                for (var i = 0; i < messages.length; i++) {
-                    if (messages[i].chat === currentChat) {
-                        chatMessages.push(messages[i]);
-                    }
-                }
-                for (var j = 0; j < chatMessages.length; j++) {
-                    var m = chatMessages[j];
+                var chatMessages = messages.filter(function(m) { return m.chat === currentChat; });
+                for (var i = 0; i < chatMessages.length; i++) {
+                    var m = chatMessages[i];
                     var div = document.createElement('div');
-                    div.className = 'message';
-                    if (m.user === currentUser) {
-                        div.className += ' me';
-                    }
+                    div.className = 'message' + (m.user === currentUser ? ' me' : '');
                     div.textContent = m.user + ': ' + m.text + ' (' + m.time + ')';
                     container.appendChild(div);
                 }
-                container.scrollTop = container.scrollHeight;
             });
         }
 
@@ -283,13 +155,12 @@
             var text = input.value.trim();
             if (!text) return;
             loadData(function() {
-                var newMsg = {
+                messages.push({
                     chat: currentChat,
                     user: currentUser,
                     text: text,
                     time: new Date().toLocaleTimeString()
-                };
-                messages.push(newMsg);
+                });
                 saveData(function() {
                     input.value = '';
                     renderMessages();
@@ -303,13 +174,11 @@
         }
 
         function showPage(pageId) {
-            var pages = document.querySelectorAll('.page');
-            for (var i = 0; i < pages.length; i++) {
-                pages[i].classList.remove('active');
-            }
+            document.querySelectorAll('.page').forEach(function(p) { p.classList.remove('active'); });
             document.getElementById(pageId).classList.add('active');
         }
 
+        // ============= INIT =============
         loadData(function() {
             if (localStorage.getItem('currentUser')) {
                 var user = localStorage.getItem('currentUser');
