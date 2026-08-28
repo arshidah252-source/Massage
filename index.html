@@ -237,7 +237,13 @@
         }
 
         function renderChatList() {
-            document.getElementById('chatList').innerHTML = '<div class="chat-item" onclick="openChat(\'General\')">📢 General</div>';
+            var container = document.getElementById('chatList');
+            container.innerHTML = '';
+            var div = document.createElement('div');
+            div.className = 'chat-item';
+            div.innerHTML = '📢 General';
+            div.onclick = function() { openChat('General'); };
+            container.appendChild(div);
         }
 
         function openChat(name) {
@@ -252,11 +258,19 @@
             var container = document.getElementById('chatMessages');
             container.innerHTML = '';
             loadData(function() {
-                var chatMessages = messages.filter(function(m) { return m.chat === currentChat; });
-                for (var i = 0; i < chatMessages.length; i++) {
-                    var m = chatMessages[i];
+                var chatMessages = [];
+                for (var i = 0; i < messages.length; i++) {
+                    if (messages[i].chat === currentChat) {
+                        chatMessages.push(messages[i]);
+                    }
+                }
+                for (var j = 0; j < chatMessages.length; j++) {
+                    var m = chatMessages[j];
                     var div = document.createElement('div');
-                    div.className = 'message' + (m.user === currentUser ? ' me' : '');
+                    div.className = 'message';
+                    if (m.user === currentUser) {
+                        div.className += ' me';
+                    }
                     div.textContent = m.user + ': ' + m.text + ' (' + m.time + ')';
                     container.appendChild(div);
                 }
@@ -269,12 +283,13 @@
             var text = input.value.trim();
             if (!text) return;
             loadData(function() {
-                messages.push({
+                var newMsg = {
                     chat: currentChat,
                     user: currentUser,
                     text: text,
                     time: new Date().toLocaleTimeString()
-                });
+                };
+                messages.push(newMsg);
                 saveData(function() {
                     input.value = '';
                     renderMessages();
@@ -288,7 +303,10 @@
         }
 
         function showPage(pageId) {
-            document.querySelectorAll('.page').forEach(function(p) { p.classList.remove('active'); });
+            var pages = document.querySelectorAll('.page');
+            for (var i = 0; i < pages.length; i++) {
+                pages[i].classList.remove('active');
+            }
             document.getElementById(pageId).classList.add('active');
         }
 
@@ -303,4 +321,4 @@
         });
     </script>
 </body>
-                    </html>
+</html>
