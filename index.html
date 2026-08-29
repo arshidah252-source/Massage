@@ -1,60 +1,49 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Messenger</title>
+  <head>
+    <meta charset="UTF-8">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
     <meta name="apple-mobile-web-app-title" content="Messenger">
     <link rel="apple-touch-icon" sizes="192x192" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💬</text></svg>">
+    <title>Messenger</title>
+  </head>  
+     <title>Messenger</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: sans-serif; }
-        body { background: #ffe6e6; color: #b3002d; height: 100vh; display: flex; flex-direction: column; }
-        .page { display: none; flex: 1; padding: 16px; overflow-y: auto; }
-        .page.active { display: flex; flex-direction: column; }
+        body { background: #ffe6e6; color: #b3002d; }
+        .page { display: none; padding: 16px; }
+        .page.active { display: block; }
         input, button { padding: 8px; border-radius: 8px; border: none; }
         button { background: #ff0066; color: #fff; cursor: pointer; }
         .message { background: #ffcccc; padding: 6px; margin: 4px 0; border-radius: 6px; }
         .me { background: #ff4d4d; color: #fff; text-align: right; }
-        .bottom-nav { display: flex; justify-content: space-around; background: #ff4d4d; padding: 10px; flex-shrink: 0; }
-        .bottom-nav button { background: none; color: #fff; border: none; font-size: 14px; }
+        .bottom-nav { display: flex; justify-content: space-around; background: #ff4d4d; padding: 10px; }
+        .bottom-nav button { background: none; color: #fff; border: none; }
         .bottom-nav button.active { border-bottom: 2px solid #fff; }
-        .input-area { display: flex; gap: 8px; padding: 8px 0; flex-shrink: 0; }
-        .input-area input { flex: 1; background: #ffcccc; color: #b3002d; }
-        #chatMessages { flex: 1; overflow-y: auto; margin-bottom: 8px; }
-        .chat-item { background: #ffcccc; padding: 12px; border-radius: 8px; margin-bottom: 8px; cursor: pointer; }
-        .chat-item:hover { background: #ffb3b3; }
-        .auth-box { max-width: 300px; margin: auto; text-align: center; padding: 20px; }
-        .auth-box input { width: 100%; margin: 6px 0; background: #ffcccc; color: #b3002d; }
-        .auth-box button { width: 100%; margin: 6px 0; }
     </style>
 </head>
 <body>
 
     <div id="authPage" class="page active">
-        <div class="auth-box">
-            <h2>🐱 Messenger</h2>
-            <input type="text" id="authUsername" placeholder="Username...">
-            <button onclick="register()">Register</button>
-            <button onclick="login()" style="background:#800020;">Login</button>
-        </div>
+        <h2>🐱 Messenger</h2>
+        <input type="text" id="authUsername" placeholder="Username...">
+        <button onclick="register()">Register</button>
+        <button onclick="login()" style="background:#800020;">Login</button>
     </div>
 
-    <div id="appPage" style="display:none; flex-direction:column; height:100vh;">
+    <div id="appPage" style="display:none;">
         <div id="chatsPage" class="page active">
             <h2>💬 Chats</h2>
             <div id="chatList"></div>
         </div>
 
         <div id="chatPage" class="page">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-                <button onclick="backToChats()" style="background:#800020;">← Back</button>
-                <span id="chatTitle" style="font-weight:bold;">General</span>
-            </div>
+            <button onclick="backToChats()">← Back</button>
             <div id="chatMessages"></div>
-            <div class="input-area">
-                <input type="text" id="chatInput" placeholder="Type...">
-                <button onclick="sendMessage()">Send</button>
-            </div>
+            <input type="text" id="chatInput" placeholder="Type...">
+            <button onclick="sendMessage()">Send</button>
         </div>
 
         <div class="bottom-nav">
@@ -64,14 +53,17 @@
     </div>
 
     <script>
+        // ============= JSONBIN CONFIG =============
         var BIN_ID = '6a790240f5f4af5e29000367';
         var API_KEY = '$2a$10$YJqHMZfdvZ/oBZOz6EoWgexdGklYtIB8Hf2VhmRSujXeWTo4xnGfG';
 
+        // ============= STATE =============
         var currentUser = localStorage.getItem('currentUser') || null;
         var users = [];
         var messages = [];
         var currentChat = 'General';
 
+        // ============= LOAD DATA =============
         function loadData(callback) {
             var xhr = new XMLHttpRequest();
             xhr.open('GET', 'https://api.jsonbin.io/v3/b/' + BIN_ID, true);
@@ -99,6 +91,7 @@
             xhr.send(data);
         }
 
+        // ============= REGISTER =============
         function register() {
             var username = document.getElementById('authUsername').value.trim();
             if (!username) return alert('Enter a username');
@@ -128,25 +121,25 @@
             currentUser = null;
             localStorage.removeItem('currentUser');
             document.getElementById('appPage').style.display = 'none';
-            document.getElementById('authPage').style.display = 'block';
             document.getElementById('authPage').classList.add('active');
+            document.getElementById('authPage').style.display = 'block';
         }
 
         function showApp() {
             document.getElementById('authPage').style.display = 'none';
-            document.getElementById('appPage').style.display = 'flex';
+            document.getElementById('appPage').style.display = 'block';
             renderChatList();
         }
 
+        // ============= RENDER =============
         function renderChatList() {
             document.getElementById('chatList').innerHTML = '<div class="chat-item" onclick="openChat(\'General\')">📢 General</div>';
         }
 
         function openChat(name) {
             currentChat = name;
-            document.getElementById('chatTitle').textContent = name;
-            document.getElementById('chatsPage').classList.remove('active');
             document.getElementById('chatPage').classList.add('active');
+            document.getElementById('chatsPage').classList.remove('active');
             renderMessages();
         }
 
@@ -162,7 +155,6 @@
                     div.textContent = m.user + ': ' + m.text + ' (' + m.time + ')';
                     container.appendChild(div);
                 }
-                container.scrollTop = container.scrollHeight;
             });
         }
 
@@ -194,6 +186,7 @@
             document.getElementById(pageId).classList.add('active');
         }
 
+        // ============= INIT =============
         loadData(function() {
             if (localStorage.getItem('currentUser')) {
                 var user = localStorage.getItem('currentUser');
