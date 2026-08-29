@@ -11,17 +11,111 @@
     <title>Messenger</title>
     
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: sans-serif; }
-        body { background: #ffe6e6; color: #b3002d; }
-        .page { display: none; padding: 16px; }
-        .page.active { display: block; }
-        input, button { padding: 8px; border-radius: 8px; border: none; }
-        button { background: #ff0066; color: #fff; cursor: pointer; }
-        .message { background: #ffcccc; padding: 6px; margin: 4px 0; border-radius: 6px; }
-        .me { background: #ff4d4d; color: #fff; text-align: right; }
-        .bottom-nav { display: flex; justify-content: space-around; background: #ff4d4d; padding: 10px; }
-        .bottom-nav button { background: none; color: #fff; border: none; }
-        .bottom-nav button.active { border-bottom: 2px solid #fff; }
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: sans-serif; }
+    body { 
+        background: #ffe6e6; 
+        color: #b3002d; 
+        height: 100vh; 
+        display: flex; 
+        flex-direction: column; 
+    }
+    .page { 
+        display: none; 
+        flex: 1; 
+        padding: 16px; 
+        overflow-y: auto; 
+    }
+    .page.active { 
+        display: flex; 
+        flex-direction: column; 
+    }
+    input, button { 
+        padding: 8px; 
+        border-radius: 8px; 
+        border: none; 
+    }
+    button { 
+        background: #ff0066; 
+        color: #fff; 
+        cursor: pointer; 
+    }
+    .message { 
+        background: #ffcccc; 
+        padding: 6px; 
+        margin: 4px 0; 
+        border-radius: 6px; 
+    }
+    .me { 
+        background: #ff4d4d; 
+        color: #fff; 
+        text-align: right; 
+    }
+    .bottom-nav { 
+        display: flex; 
+        justify-content: space-around; 
+        background: #ff4d4d; 
+        padding: 10px; 
+        flex-shrink: 0; 
+    }
+    .bottom-nav button { 
+        background: none; 
+        color: #fff; 
+        border: none; 
+        font-size: 14px; 
+    }
+    .bottom-nav button.active { 
+        border-bottom: 2px solid #fff; 
+    }
+    .input-area {
+        display: flex;
+        gap: 8px;
+        padding: 8px 0;
+        flex-shrink: 0;
+    }
+    .input-area input {
+        flex: 1;
+        background: #ffcccc;
+        color: #b3002d;
+    }
+    #chatMessages {
+        flex: 1;
+        overflow-y: auto;
+        margin-bottom: 8px;
+    }
+    .chat-item {
+        background: #ffcccc;
+        padding: 12px;
+        border-radius: 8px;
+        margin-bottom: 8px;
+        cursor: pointer;
+    }
+    .chat-item:hover {
+        background: #ffb3b3;
+    }
+    .auth-box {
+        max-width: 300px;
+        margin: auto;
+        text-align: center;
+        padding: 20px;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 90%;
+        background: #ffcccc;
+        border-radius: 16px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    .auth-box input {
+        width: 90%;
+        margin: 6px 0;
+        background: #ffe6e6;
+        color: #b3002d;
+    }
+    .auth-box button {
+        width: 100%;
+        margin: 6px 0;
+    }
     </style>
 </head>
 <body>
